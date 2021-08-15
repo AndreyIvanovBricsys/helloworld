@@ -34,6 +34,11 @@ jobs:
     runs-on: windows-2019
 
     steps:
+    - name: Generate build number
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.github_token}}
+
     - uses: actions/checkout@v2
 
     - name: Configure CMake
@@ -47,18 +52,19 @@ jobs:
         name: helloworld
         path: build/Release/helloworld.exe
 
-    - uses: actions/create-release@v1
+    - id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ env.BUILD_NUMBER }}
+        release_name: Release ${{ env.BUILD_NUMBER }}
 
     - uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # From actions/create-release@v1
-        asset_path: ./my-artifact.zip
-        asset_name: my-artifact.zip
-        asset_content_type: application/zip
+        asset_path: build/Release/helloworld.exe
+        asset_name: helloworld.exe
+        asset_content_type: application/exe
