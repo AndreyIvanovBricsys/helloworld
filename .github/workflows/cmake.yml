@@ -34,6 +34,11 @@ jobs:
     runs-on: windows-2019
 
     steps:
+    - name: Generate build number
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.github_token}}
+
     - uses: actions/checkout@v2
 
     - name: Configure CMake
@@ -51,8 +56,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ env.BUILD_NUMBER }}
+        release_name: Release ${{ env.BUILD_NUMBER }}
 
     - uses: actions/upload-release-asset@v1
       env:
